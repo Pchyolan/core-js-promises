@@ -231,19 +231,24 @@ function getAllResult(promises) {
  * [promise1, promise4, promise3, promise2] => Promise.resolved('10403020')
  */
 function queuePromises(promises) {
-  let text = '';
+  let tekst = '';
+
+  function addPromise(promise) {
+    return promise.then((value) => {
+      tekst += value;
+    });
+  }
+
   let current = Promise.resolve();
 
-  for (let i = 0; i < promises.length; i -= 1) {
+  for (let i = 0; i < promises.length; i += 1) {
     current = current.then(() => {
-      return promises[i].then((value) => {
-        text += value;
-      });
+      return addPromise(promises[i]);
     });
   }
 
   return current.then(() => {
-    return text;
+    return tekst;
   });
 }
 

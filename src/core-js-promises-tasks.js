@@ -17,8 +17,14 @@
  * 0    => promise that will be fulfilled
  * 1    => promise that will be fulfilled
  */
-function getPromise(/* number */) {
-  throw new Error('Not implemented');
+function getPromise(number) {
+  return new Promise((resolve, reject) => {
+    if (number >= 0) {
+      resolve(number);
+    } else {
+      reject(number);
+    }
+  });
 }
 
 /**
@@ -33,8 +39,16 @@ function getPromise(/* number */) {
  * Promise.resolve('success') => promise that will be fulfilled with 'success' value
  * Promise.reject('fail')     => promise that will be fulfilled with 'fail' value
  */
-function getPromiseResult(/* source */) {
-  throw new Error('Not implemented');
+function getPromiseResult(source) {
+  return new Promise((resolve) => {
+    source
+      .then(() => {
+        resolve('success');
+      })
+      .catch(() => {
+        resolve('fail');
+      });
+  });
 }
 
 /**
@@ -50,8 +64,27 @@ function getPromiseResult(/* source */) {
  * [Promise.resolve(1), Promise.reject(2), Promise.resolve(3)]  => Promise fulfilled with 1
  * [Promise.reject(1), Promise.reject(2), Promise.reject(3)]    => Promise rejected
  */
-function getFirstResolvedPromiseResult(/* promises */) {
-  throw new Error('Not implemented');
+function getFirstResolvedPromiseResult(promises) {
+  return new Promise((resolve, reject) => {
+    let errors = 0;
+
+    promises.forEach((promise) => {
+      promise
+        .then((value) => {
+          resolve(value);
+        })
+        .catch(() => {
+          errors += 1;
+          if (errors === promises.length) {
+            reject();
+          }
+        });
+    });
+
+    if (promises.length === 0) {
+      reject();
+    }
+  });
 }
 
 /**
@@ -73,8 +106,29 @@ function getFirstResolvedPromiseResult(/* promises */) {
  * [promise3, promise6, promise2] => Promise rejected with 2
  * [promise3, promise4, promise6] => Promise rejected with 6
  */
-function getFirstPromiseResult(/* promises */) {
-  throw new Error('Not implemented');
+function getFirstPromiseResult(promises) {
+  return new Promise((resolve, reject) => {
+    let done = false;
+
+    promises.forEach((promise) => {
+      promise
+        .then((value) => {
+          if (!done) {
+            done = true;
+            resolve(value);
+          }
+        })
+        .catch((error) => {
+          if (!done) {
+            done = true;
+            reject(error);
+          }
+        });
+    });
+    if (promises.length === 0) {
+      reject();
+    }
+  });
 }
 
 /**
@@ -88,8 +142,30 @@ function getFirstPromiseResult(/* promises */) {
  * [Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)] => Promise fulfilled with [1, 2, 3]
  * [Promise.resolve(1), Promise.reject(2), Promise.resolve(3)] => Promise rejected with 2
  */
-function getAllOrNothing(/* promises */) {
-  throw new Error('Not implemented');
+function getAllOrNothing(promises) {
+  return new Promise((resolve, reject) => {
+    const results = [];
+    let count = 0;
+
+    promises.forEach((promise, i) => {
+      promise
+        .then((value) => {
+          results[i] = value;
+          count += 1;
+
+          if (count === promises.length) {
+            resolve(results);
+          }
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+
+    if (promises.length === 0) {
+      resolve([]);
+    }
+  });
 }
 
 /**
